@@ -1,0 +1,14 @@
+{
+  "id": "backshed",
+  "name": "The Backyard Shed",
+  "display_name": "The Backyard Shed",
+  "author": ["Kouimy"],
+  "description": "Add the Storage Box joker, to put into storage jokers",
+  "prefix": "tbs",
+  "main_file": "main.lua",
+  "priority": 0,
+  "badge_colour": "80b0ad",
+  "badge_text_colour": "aeb080",
+  "version": "0.1",
+  "dependencies": ["Steamodded (>=1.*)", "Lovely (>=0.6)", "Balatro (>=1.*)"]
+}
