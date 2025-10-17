@@ -1,6 +1,6 @@
-local STOREO_JOKER_SLOT_ADDED = 3
+local stbox_JOKER_SLOT_ADDED = 3
 
-local function storeo_count(self, offset)
+local function stbox_count(self, offset)
     local count = offset
     if G.jokers.cards[1] then
         for i = 1, #G.jokers.cards do
@@ -18,47 +18,47 @@ local function debuff_math(added_slots, offset)
 end
 
 local function get_debuff_count(self, offset)
-    local storeo_cnt = storeo_count(self, offset)
-    local total_slot_added = STOREO_JOKER_SLOT_ADDED * storeo_cnt
+    local stbox_cnt = stbox_count(self, offset)
+    local total_slot_added = stbox_JOKER_SLOT_ADDED * stbox_cnt
 
     return debuff_math(total_slot_added, offset)
 end
 
-local function storeo_add_to_deck(self, card, from_debuff)
-    G.jokers.config.card_limit = G.jokers.config.card_limit + STOREO_JOKER_SLOT_ADDED
+local function stbox_add_to_deck(self, card, from_debuff)
+    G.jokers.config.card_limit = G.jokers.config.card_limit + stbox_JOKER_SLOT_ADDED
 end
 
 local function perma_debuff(jok)
-    jok.ability.storeo_perma_debuff = true
+    jok.ability.stbox_perma_debuff = true
 end
 
 
 local function debuff_jok(jok)
-    jok.ability.storeo_debuff = true
+    jok.ability.stbox_debuff = true
     jok:set_debuff(true)
 
     -- hacky fix to counteract the joker reenabling when blind is selected and other possible events
-    if not jok.ability.storeo_debuff_fn_replaced then
+    if not jok.ability.stbox_debuff_fn_replaced then
         local old_set_debuff = jok.set_debuff;
         jok.set_debuff = function(self, should_debuff)
-            if self.ability.storeo_debuff then
+            if self.ability.stbox_debuff then
                 return
             end
             old_set_debuff(self, should_debuff)
         end
-        jok.ability.storeo_debuff_fn_replaced = true
+        jok.ability.stbox_debuff_fn_replaced = true
     end
 end
 
 local function reenable_jok(jok)
-    jok.ability.storeo_debuff = false
+    jok.ability.stbox_debuff = false
     jok:set_debuff(false)
 end
 
-local function storeo_remove_from_deck(self, card, from_debuff)
+local function stbox_remove_from_deck(self, card, from_debuff)
     local debuffed_count = get_debuff_count(self, 1)
-    local to_rebuff = debuff_math(STOREO_JOKER_SLOT_ADDED, 1)
-    G.jokers.config.card_limit = G.jokers.config.card_limit - STOREO_JOKER_SLOT_ADDED
+    local to_rebuff = debuff_math(stbox_JOKER_SLOT_ADDED, 1)
+    G.jokers.config.card_limit = G.jokers.config.card_limit - stbox_JOKER_SLOT_ADDED
     local to_skip = debuffed_count - to_rebuff
     for i = 1, #G.jokers.cards do
         if to_rebuff <= 0 then
@@ -67,7 +67,7 @@ local function storeo_remove_from_deck(self, card, from_debuff)
         local jok = G.jokers.cards[#G.jokers.cards + 1 - i]
         if jok.ability.name == self.name then
             -- pass self
-        elseif jok.ability.storeo_debuff and not jok.ability.storeo_perma_debuff then
+        elseif jok.ability.stbox_debuff and not jok.ability.stbox_perma_debuff then
             if to_skip > 0 then
                 to_skip = to_skip - 1
             else
@@ -82,16 +82,16 @@ local function storeo_remove_from_deck(self, card, from_debuff)
     end
 end
 
-local function storeo_update(self, dt)
+local function stbox_update(self, dt)
     if G.STAGE == G.STAGES.RUN then
         local to_debuff = get_debuff_count(self, 0)
         local debuffing = true
         for i = 1, #G.jokers.cards do
             debuffing = to_debuff > 0
             local jok = G.jokers.cards[#G.jokers.cards + 1 - i]
-            if jok.ability.name == self.name or jok.ability.storeo_perma_debuff then
+            if jok.ability.name == self.name or jok.ability.stbox_perma_debuff then
                 -- pass
-            elseif jok.ability.storeo_debuff then
+            elseif jok.ability.stbox_debuff then
                 if debuffing then
                     to_debuff = to_debuff - 1
                 else
@@ -108,7 +108,7 @@ end
 
 
 SMODS.Joker {
-    key = 'storeo',
+    key = 'stbox',
     loc_txt = {
         name = 'Storage box',
         text = {
@@ -123,9 +123,9 @@ SMODS.Joker {
     blueprint_compat = false,
     eternal_compat = true,
     perishable_compat = true,
-    add_to_deck = storeo_add_to_deck,
-    remove_from_deck = storeo_remove_from_deck,
-    update = storeo_update
+    add_to_deck = stbox_add_to_deck,
+    remove_from_deck = stbox_remove_from_deck,
+    update = stbox_update
 }
 
 SMODS.Back {
@@ -146,7 +146,7 @@ SMODS.Back {
         G.E_MANAGER:add_event(Event({
             func = function()
                 if G.jokers then
-                    local card = create_card("Joker", G.jokers, true, 4, nil, nil, "j_tbs_storeo", nil)
+                    local card = create_card("Joker", G.jokers, true, 4, nil, nil, "j_tbs_stbox", nil)
                     card:set_edition({ negative = true }, true)
                     card:add_to_deck()
                     G.jokers:emplace(card)
